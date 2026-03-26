@@ -74,7 +74,49 @@ These are consumed by `.github/workflows/deploy.yml`.
 
 ---
 
-## Step 6 — Install dependencies and verify locally
+## Step 6 — Set up GitHub MCP for Claude Code
+
+This gives Claude read-only visibility into CI results and Dependabot alerts so it
+can diagnose failures and suggest fixes without you copying logs manually.
+
+**Generate a fine-grained GitHub token** (one-time, per developer):
+1. Go to `github.com/settings/tokens` → **Fine-grained tokens**
+2. Resource owner → your org
+3. Repository access → **Only select repositories** → add this repo
+4. Permissions (read-only):
+   - `checks:read`, `actions:read`, `contents:read`, `pull-requests:read`
+   - `issues:write` (optional — lets Claude open bypass post-mortems)
+5. Expiry → 90 days
+
+**Store the token securely** (never paste it into any file):
+
+```bash
+# Mac — store in keychain, load into env at shell startup
+security add-generic-password -a "$USER" -s GITHUB_TOKEN -w "ghp_your_token_here"
+echo 'export GITHUB_TOKEN=$(security find-generic-password -a "$USER" -s GITHUB_TOKEN -w)' >> ~/.zshrc
+
+# Linux — add to ~/.bashrc (or use pass / 1Password CLI for plaintext-free storage)
+echo 'export GITHUB_TOKEN="ghp_your_token_here"' >> ~/.bashrc
+```
+
+**Verify the MCP server config exists** at `~/.claude/mcp.json`:
+```json
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@github/mcp-server"]
+    }
+  }
+}
+```
+
+If the file doesn't exist yet, create it — no token goes in this file.
+Restart Claude Code and the `github` MCP server will connect automatically.
+
+---
+
+## Step 7 — Install dependencies and verify locally
 
 ```bash
 cp .env.example .env
@@ -134,6 +176,11 @@ Before calling the project "set up", confirm all of these:
 - [ ] `bash scripts/check-all.sh` passes with no errors
 - [ ] `npm run evals` completes (even with placeholder model call)
 - [ ] Health endpoint returns `200 OK`
+
+### Claude Code / MCP
+- [ ] `GITHUB_TOKEN` is set in your shell environment (`echo $GITHUB_TOKEN` should print a value)
+- [ ] `~/.claude/mcp.json` exists with the `github` server entry (no token in the file)
+- [ ] After restarting Claude Code, `github` appears in available MCP tools
 
 ### Documentation
 - [ ] `docs/requirements/rfi-summary.md` is filled in
