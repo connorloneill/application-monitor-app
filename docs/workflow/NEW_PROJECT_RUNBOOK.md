@@ -55,12 +55,15 @@ This script will:
 - Configure branch protection (required reviews, no force push)
 - Enable secret scanning + push protection
 - Install pre-commit hooks (blocks secrets from being committed)
+- Print the `gh secret set` commands you need to run next (Step 5)
 
 If you prefer to do it manually, see [BRANCH_PROTECTION_SETUP.md](BRANCH_PROTECTION_SETUP.md).
 
 ---
 
 ## Step 5 — Add GitHub Actions secrets
+
+Run the commands that `init-repo.sh` printed at the end, or copy them from here:
 
 ```bash
 gh secret set AWS_REGION              --repo my-org/my-new-app
@@ -74,45 +77,81 @@ These are consumed by `.github/workflows/deploy.yml`.
 
 ---
 
-## Step 6 — Set up GitHub MCP for Claude Code
+## Step 6 — Set up GitHub MCP for Claude Code (optional)
 
-This gives Claude read-only visibility into CI results and Dependabot alerts so it
-can diagnose failures and suggest fixes without you copying logs manually.
+This gives Claude Code direct access to GitHub — reading issues, PRs, CI results,
+and Dependabot alerts — so it can diagnose failures and suggest fixes without you
+copying logs manually.
 
-**Generate a fine-grained GitHub token** (one-time, per developer):
+### 6a. Generate a fine-grained GitHub token (one-time, per developer)
+
 1. Go to `github.com/settings/tokens` → **Fine-grained tokens**
 2. Resource owner → your org
 3. Repository access → **Only select repositories** → add this repo
-4. Permissions (read-only):
+4. Permissions (read-only is sufficient for most use cases):
    - `checks:read`, `actions:read`, `contents:read`, `pull-requests:read`
-   - `issues:write` (optional — lets Claude open bypass post-mortems)
+   - `issues:write` (optional — lets Claude open issues)
 5. Expiry → 90 days
 
-**Store the token securely** (never paste it into any file):
+### 6b. Create `.mcp.json` in the project root
 
-```bash
-# Mac — store in keychain, load into env at shell startup
-security add-generic-password -a "$USER" -s GITHUB_TOKEN -w "ghp_your_token_here"
-echo 'export GITHUB_TOKEN=$(security find-generic-password -a "$USER" -s GITHUB_TOKEN -w)' >> ~/.zshrc
+Create a `.mcp.json` file in the repo root (it's already in `.gitignore`):
 
-# Linux — add to ~/.bashrc (or use pass / 1Password CLI for plaintext-free storage)
-echo 'export GITHUB_TOKEN="ghp_your_token_here"' >> ~/.bashrc
-```
-
-**Verify the MCP server config exists** at `~/.claude/mcp.json`:
 ```json
 {
   "mcpServers": {
     "github": {
       "command": "npx",
-      "args": ["-y", "@github/mcp-server"]
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "<your-token-here>"
+      }
     }
   }
 }
 ```
 
-If the file doesn't exist yet, create it — no token goes in this file.
-Restart Claude Code and the `github` MCP server will connect automatically.
+Replace `<your-token-here>` with the token from step 6a.
+
+> **Security note:** `.mcp.json` contains your token and must never be committed.
+> This template's `.gitignore` already excludes it. Verify with `git check-ignore .mcp.json`.
+
+### 6c. Enable the server in Claude Code
+
+Start or restart Claude Code, then:
+1. Run `/mcp` — you should see the `github` server listed
+2. Approve the server when prompted
+3. Verify it shows as connected
+
+Alternatively, if Claude Code prompts you to approve the server on startup, accept it.
+
+### Alternative: global setup (shared across all projects)
+
+If you prefer a single config for all repos, store the token in your shell
+environment and use a global MCP config:
+
+```bash
+# Mac — store in keychain
+security add-generic-password -a "$USER" -s GITHUB_TOKEN -w "ghp_your_token_here"
+echo 'export GITHUB_PERSONAL_ACCESS_TOKEN=$(security find-generic-password -a "$USER" -s GITHUB_TOKEN -w)' >> ~/.zshrc
+
+# Linux — add to ~/.bashrc (or use pass / 1Password CLI)
+echo 'export GITHUB_PERSONAL_ACCESS_TOKEN="ghp_your_token_here"' >> ~/.bashrc
+```
+
+Then create `~/.mcp.json`:
+```json
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"]
+    }
+  }
+}
+```
+
+The server will pick up `GITHUB_PERSONAL_ACCESS_TOKEN` from the environment automatically.
 
 ---
 
@@ -135,7 +174,7 @@ Verify:
 
 ---
 
-## Step 7 — First feature branch
+## Step 8 — First feature branch
 
 Never commit directly to `main`. Always use a branch:
 
@@ -177,10 +216,10 @@ Before calling the project "set up", confirm all of these:
 - [ ] `npm run evals` completes (even with placeholder model call)
 - [ ] Health endpoint returns `200 OK`
 
-### Claude Code / MCP
-- [ ] `GITHUB_TOKEN` is set in your shell environment (`echo $GITHUB_TOKEN` should print a value)
-- [ ] `~/.claude/mcp.json` exists with the `github` server entry (no token in the file)
-- [ ] After restarting Claude Code, `github` appears in available MCP tools
+### Claude Code / MCP (if Step 6 was completed)
+- [ ] `.mcp.json` exists in project root with the `github` server entry
+- [ ] `.mcp.json` is ignored by git (`git check-ignore .mcp.json` prints the path)
+- [ ] After restarting Claude Code, `/mcp` shows `github` as connected
 
 ### Documentation
 - [ ] `docs/requirements/rfi-summary.md` is filled in
