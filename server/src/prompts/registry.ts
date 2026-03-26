@@ -1,0 +1,30 @@
+import fs from 'fs'
+import path from 'path'
+
+// Prompt registry — maps logical names to versioned files.
+// Always reference prompts by name, never hardcode text inline.
+// This makes rollback as simple as changing a version string.
+
+const PROMPTS_DIR = path.join(__dirname)
+
+interface PromptEntry {
+  file: string
+  version: string
+}
+
+const registry: Record<string, PromptEntry> = {
+  default_system: { file: 'system/default_v1.txt', version: 'v1' },
+  // Add new prompts here:
+  // my_feature_system: { file: 'system/my_feature_v1.txt', version: 'v1' },
+}
+
+export function getPrompt(name: string): string {
+  const entry = registry[name]
+  if (!entry) throw new Error(`Unknown prompt: "${name}"`)
+  const filePath = path.join(PROMPTS_DIR, entry.file)
+  return fs.readFileSync(filePath, 'utf-8').trim()
+}
+
+export function getPromptVersion(name: string): string {
+  return registry[name]?.version ?? 'unknown'
+}
