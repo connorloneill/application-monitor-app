@@ -1,0 +1,19 @@
+# CODEOWNERS — controls who must review changes to specific paths.
+# Last matching rule wins. Adjust usernames/teams to match your org.
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default: all changes require review from a lead
+*                               @your-org/leads
+
+# Infrastructure & CI changes require a second set of eyes
+.github/                        @your-org/leads @your-org/devops
+infrastructure/                 @your-org/leads @your-org/devops
+
+# AI/prompt changes require AI lead sign-off
+server/src/prompts/             @your-org/ai-lead
+server/src/agents/              @your-org/ai-lead
+server/src/evals/               @your-org/ai-lead
+
+# Security-sensitive middleware
+server/src/middleware/auth.ts   @your-org/leads
+server/src/middleware/rbac.ts   @your-org/leads

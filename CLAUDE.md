@@ -42,12 +42,15 @@ that conflict with these requirements without flagging the conflict first.
 | API client calls | `client/src/services/` |
 | Global state | `client/src/contexts/` |
 
-## Development Notes
+## Development Workflow
 
 - Run `npm run dev` from root to start both client and server
 - Run `npm run evals` to execute the LLM evaluation harness
 - All secrets go in `.env` (never commit — see `.env.example` for required vars)
 - Feature docs live in `docs/in_progress/` while being built, move to `docs/completed/` when shipped
+- **Starting a new project from this template**: see `docs/workflow/NEW_PROJECT_RUNBOOK.md`
+- **Branch strategy**: feature branches only — never commit directly to `main`
+- **Branch protection & security setup**: see `docs/workflow/BRANCH_PROTECTION_SETUP.md`
 
 ## Active Features
 
