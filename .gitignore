@@ -45,6 +45,9 @@ Thumbs.db
 *.swp
 *.swo
 
+# Claude Code
+.claude/
+
 # AWS / cloud credentials (never commit these)
 *.pem
 *.key

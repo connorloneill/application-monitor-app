@@ -165,11 +165,11 @@ cd client && npm install && cd ..
 cd server && npm install && cd ..
 npm install   # root (concurrently)
 
-npm run dev   # should start client on :5173 and server on :3000
+npm run dev   # should start client on :6110 and server on :3000
 ```
 
 Verify:
-- [ ] `http://localhost:5173` loads the login page
+- [ ] `http://localhost:6110` loads the login page
 - [ ] `http://localhost:3000/api/health` returns `{"status":"ok"}`
 
 ---

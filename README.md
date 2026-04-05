@@ -12,7 +12,7 @@ cd ../server && npm install   # Install server deps
 cd .. && npm run dev          # Start both client + server
 ```
 
-- **Client**: http://localhost:5173
+- **Client**: http://localhost:6110
 - **Server**: http://localhost:3000
 - **Health check**: http://localhost:3000/api/health
 

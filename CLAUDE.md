@@ -7,7 +7,7 @@ Keep it up to date as the project evolves.
 
 **What it does:** [One sentence description]
 **Stack:** React + TypeScript (client) · Node.js + Express + TypeScript (server) · AWS Bedrock · DynamoDB
-**Ports:** Client: 5173 · Server: 3000
+**Ports:** Client: 6110 · Server: 3000
 
 ## Requirements
 

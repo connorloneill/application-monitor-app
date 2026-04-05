@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import jwt from 'jsonwebtoken'
+import jwt, { type SignOptions } from 'jsonwebtoken'
 import { config } from '../config'
 import { AppError } from '../middleware/errorHandler'
 
@@ -12,10 +12,12 @@ router.post('/login', (req, res, next) => {
     if (!email || !password) throw new AppError(400, 'Email and password are required')
 
     // TODO: validate against your user store
-    if (password !== 'demo') throw new AppError(401, 'Invalid credentials')
+    if (email !== 'coneill@andrew-morgan.com' || password !== 'simple')
+      throw new AppError(401, 'Invalid credentials')
 
     const user = { id: '1', email, role: 'user' }
-    const token = jwt.sign(user, config.jwt.secret, { expiresIn: config.jwt.expiresIn })
+    const opts: SignOptions = { expiresIn: config.jwt.expiresIn as SignOptions['expiresIn'] }
+    const token = jwt.sign(user, config.jwt.secret, opts)
 
     res.json({ token, user })
   } catch (err) {

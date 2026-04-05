@@ -2,8 +2,10 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import LoginPage from './pages/LoginPage'
-import DashboardPage from './pages/DashboardPage'
 import ProtectedRoute from './components/ProtectedRoute'
+import AppLayout from './components/AppLayout'
+import ProblemReportsPage from './pages/ProblemReportsPage'
+import ProblemReportDetailPage from './pages/ProblemReportDetailPage'
 
 export default function App() {
   return (
@@ -13,13 +15,16 @@ export default function App() {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route
-              path="/*"
+              path="/"
               element={
                 <ProtectedRoute>
-                  <DashboardPage />
+                  <AppLayout />
                 </ProtectedRoute>
               }
-            />
+            >
+              <Route index element={<ProblemReportsPage />} />
+              <Route path="reports/:reportId" element={<ProblemReportDetailPage />} />
+            </Route>
           </Routes>
         </BrowserRouter>
       </AuthProvider>

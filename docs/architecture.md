@@ -26,6 +26,6 @@ See `docs/adr/` for Architecture Decision Records.
 
 | Service | Port |
 |---|---|
-| Client (dev) | 5173 |
+| Client (dev) | 6110 |
 | Server | 3000 |
 | nginx (docker) | 80 |

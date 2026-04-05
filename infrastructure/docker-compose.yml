@@ -6,7 +6,7 @@ services:
       context: ..
       dockerfile: infrastructure/docker/Dockerfile.client
     ports:
-      - '5173:80'
+      - '6110:80'
     depends_on:
       - server
     environment:

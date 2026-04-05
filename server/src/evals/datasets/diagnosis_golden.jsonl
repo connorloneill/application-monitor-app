@@ -1,0 +1,3 @@
+{"input": "TypeError: Cannot read properties of undefined (reading 'id') in getUserProfile at src/services/userService.ts:34", "expected_output": "null check", "tags": ["null-safety", "typescript"]}
+{"input": "Memory leak detected: server RSS grows 50MB/hour. WebSocket connections accumulate in manager.ts Map without cleanup on disconnect.", "expected_output": "close event", "tags": ["memory-leak", "websocket"]}
+{"input": "SQL injection vulnerability in search endpoint. User input is concatenated directly into query string at src/routes/search.ts:22", "expected_output": "parameterized", "tags": ["security", "sql-injection"]}

@@ -7,7 +7,7 @@ function required(key: string): string {
 export const config = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
   port: parseInt(process.env.PORT ?? '3000', 10),
-  clientUrl: process.env.CLIENT_URL ?? 'http://localhost:5173',
+  clientUrl: process.env.CLIENT_URL ?? 'http://localhost:6110',
 
   jwt: {
     secret: required('JWT_SECRET'),
@@ -20,10 +20,26 @@ export const config = {
 
   bedrock: {
     modelId: process.env.BEDROCK_MODEL_ID ?? 'anthropic.claude-sonnet-4-6',
+    maxTokens: parseInt(process.env.BEDROCK_MAX_TOKENS ?? '4096', 10),
+    temperature: parseFloat(process.env.BEDROCK_TEMPERATURE ?? '0.2'),
+  },
+
+  github: {
+    token: process.env.GITHUB_TOKEN ?? '',
+  },
+
+  diagnosis: {
+    maxFilesToAnalyze: parseInt(process.env.DIAGNOSIS_MAX_FILES ?? '10', 10),
+    maxContentLength: parseInt(process.env.DIAGNOSIS_MAX_CONTENT_LENGTH ?? '150000', 10),
   },
 
   dynamodb: {
     tablePrefix: process.env.DYNAMODB_TABLE_PREFIX ?? 'myapp_',
+  },
+
+  problemReports: {
+    tableName: process.env.PROBLEM_REPORTS_TABLE ?? 'problem_reports',
+    screenshotBucket: process.env.PROBLEM_REPORTS_BUCKET ?? 'problem-reports-screenshots',
   },
 
   s3: {

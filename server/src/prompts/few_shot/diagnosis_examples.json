@@ -1,0 +1,54 @@
+[
+  {
+    "input": {
+      "issue": {
+        "title": "TypeError: Cannot read properties of undefined (reading 'id')",
+        "description": "Users intermittently get a 500 error when accessing their profile page",
+        "errorMessage": "TypeError: Cannot read properties of undefined (reading 'id')",
+        "stackTrace": "at getUserProfile (src/services/userService.ts:34)\n  at handler (src/routes/users.ts:18)"
+      },
+      "codeSnippet": "async function getUserProfile(userId: string) {\n  const user = await db.query('SELECT * FROM users WHERE id = $1', [userId]);\n  return { id: user.id, name: user.name };\n}"
+    },
+    "expected_output": {
+      "summary": "The getUserProfile function does not handle the case where the database query returns no results, leading to a TypeError when accessing properties on undefined.",
+      "rootCause": "The db.query call may return undefined when no user matches the given userId, but the code immediately accesses user.id without a null check.",
+      "suggestedFix": "Add a null check after the database query: if (!user) throw new NotFoundError('User not found'). This prevents the TypeError and returns a meaningful error.",
+      "codeSnippets": [
+        {
+          "filePath": "src/services/userService.ts",
+          "startLine": 33,
+          "endLine": 36,
+          "content": "async function getUserProfile(userId: string) {\n  const user = await db.query('SELECT * FROM users WHERE id = $1', [userId]);\n  return { id: user.id, name: user.name };\n}",
+          "explanation": "The query result is used directly without checking if a user was found. When userId doesn't match any record, user is undefined and accessing .id throws.",
+          "confidence": 0.95
+        }
+      ]
+    }
+  },
+  {
+    "input": {
+      "issue": {
+        "title": "Memory leak in WebSocket handler",
+        "description": "Server memory usage grows steadily over time, requiring restarts every 24 hours",
+        "errorMessage": "JavaScript heap out of memory",
+        "stackTrace": "at WebSocketManager.onConnection (src/ws/manager.ts:45)"
+      },
+      "codeSnippet": "class WebSocketManager {\n  private connections: Map<string, WebSocket> = new Map();\n\n  onConnection(ws: WebSocket, userId: string) {\n    this.connections.set(userId, ws);\n    ws.on('message', (data) => this.handleMessage(userId, data));\n  }\n}"
+    },
+    "expected_output": {
+      "summary": "WebSocket connections are added to the connections Map but never removed on disconnect, causing a memory leak as the Map grows indefinitely.",
+      "rootCause": "The onConnection method registers the connection but does not set up a 'close' event handler to remove disconnected clients from the Map.",
+      "suggestedFix": "Add a ws.on('close', ...) handler that calls this.connections.delete(userId) to clean up disconnected clients.",
+      "codeSnippets": [
+        {
+          "filePath": "src/ws/manager.ts",
+          "startLine": 44,
+          "endLine": 48,
+          "content": "  onConnection(ws: WebSocket, userId: string) {\n    this.connections.set(userId, ws);\n    ws.on('message', (data) => this.handleMessage(userId, data));\n  }",
+          "explanation": "Connections are stored in the Map but there is no 'close' event handler to remove them. Each new connection adds to the Map, and disconnected sockets are never cleaned up, causing unbounded memory growth.",
+          "confidence": 0.92
+        }
+      ]
+    }
+  }
+]
