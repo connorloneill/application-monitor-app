@@ -31,7 +31,7 @@ router.get(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const { status } = req.query as { status?: string }
-      const reports = await problemReportService.getByAppName(req.params.appName, { status })
+      const reports = await problemReportService.getByAppName(req.params.appName as string, { status })
       res.json({ data: reports, total: reports.length })
     } catch (err) {
       next(err)
@@ -42,7 +42,7 @@ router.get(
 // GET /api/problem-reports/:reportId — single report
 router.get('/:reportId', requireAuth, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const report = await problemReportService.getById(req.params.reportId)
+    const report = await problemReportService.getById(req.params.reportId as string)
     res.json(report)
   } catch (err) {
     next(err)
@@ -55,7 +55,7 @@ router.get(
   requireAuth,
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const report = await problemReportService.getById(req.params.reportId)
+      const report = await problemReportService.getById(req.params.reportId as string)
       if (!report.screenshot_key) {
         res.json({ url: null })
         return
@@ -80,7 +80,7 @@ router.patch(
         return
       }
       const updated = await problemReportService.updateStatus(
-        req.params.reportId,
+        req.params.reportId as string,
         status as 'new' | 'reviewed' | 'resolved'
       )
       res.json(updated)

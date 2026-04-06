@@ -7,7 +7,7 @@ const router = Router()
 // GET /api/diagnoses/:id
 router.get('/:id', requireAuth, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const diagnosis = await diagnosisService.getById(req.params.id)
+    const diagnosis = await diagnosisService.getById(req.params.id as string)
     res.json(diagnosis)
   } catch (err) {
     next(err)
