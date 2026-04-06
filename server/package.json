@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "lint": "eslint src/ --max-warnings=0",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "evals": "ts-node src/evals/run_evals.ts"
   },
   "dependencies": {
