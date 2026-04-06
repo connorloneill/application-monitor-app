@@ -21,7 +21,7 @@ export default function DiagnosisPanel({ diagnosis }: DiagnosisPanelProps) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center gap-3">
-          <div className="animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full" />
+          <div className="animate-spin h-5 w-5 border-2 border-brand-secondary border-t-transparent rounded-full" />
           <span className="text-gray-700 dark:text-gray-300">
             AI is analyzing the codebase...
           </span>

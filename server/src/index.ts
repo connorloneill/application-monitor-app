@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import path from 'path'
 import express from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
@@ -22,6 +23,16 @@ app.use(requestId)
 
 // ── Routes ───────────────────────────────────────────────────────────────
 app.use('/api', routes)
+
+// ── Static files (combined Docker image) ────────────────────────────────
+const publicDir = path.join(__dirname, 'public')
+app.use(express.static(publicDir))
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) return next()
+  res.sendFile(path.join(publicDir, 'index.html'), (err) => {
+    if (err) next()
+  })
+})
 
 // ── Error handling (must be last) ────────────────────────────────────────
 app.use(errorHandler)

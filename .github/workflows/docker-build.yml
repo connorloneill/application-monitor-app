@@ -1,0 +1,17 @@
+name: Docker Build
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    name: Docker Build Smoke Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -f infrastructure/docker/Dockerfile.combined \
+            -t app-monitor:test .

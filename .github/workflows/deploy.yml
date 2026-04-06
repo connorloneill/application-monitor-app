@@ -1,35 +1,63 @@
-name: Deploy
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  deploy:
-    name: Build & Deploy
-    runs-on: ubuntu-latest
-    environment: production
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Login to ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build and push server image
-        run: |
-          docker build -f infrastructure/docker/Dockerfile.server -t $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-
-      # TODO: add App Runner or ECS deploy step here
+# DISABLED: App Runner deployment — pending migration to new hosting platform
+#
+# name: Deploy
+#
+# on:
+#   push:
+#     branches: [main]
+#
+# jobs:
+#   deploy:
+#     name: Build & Deploy
+#     runs-on: ubuntu-latest
+#     environment: production
+#
+#     steps:
+#       - uses: actions/checkout@v4
+#
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ secrets.AWS_REGION }}
+#
+#       - name: Login to ECR
+#         id: login-ecr
+#         uses: aws-actions/amazon-ecr-login@v2
+#
+#       - name: Build and push image
+#         run: |
+#           docker build -f infrastructure/docker/Dockerfile.combined \
+#             -t $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA .
+#           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA
+#           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA $ECR_REGISTRY/$ECR_REPOSITORY:latest
+#           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+#         env:
+#           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+#
+#       - name: Deploy to App Runner
+#         run: |
+#           aws apprunner start-deployment \
+#             --service-arn ${{ secrets.APPRUNNER_SERVICE_ARN }}
+#
+#       - name: Wait for deployment
+#         run: |
+#           echo "Waiting for App Runner deployment..."
+#           for i in $(seq 1 60); do
+#             STATUS=$(aws apprunner describe-service \
+#               --service-arn ${{ secrets.APPRUNNER_SERVICE_ARN }} \
+#               --query 'Service.Status' --output text)
+#             echo "Status: $STATUS (attempt $i/60)"
+#             if [ "$STATUS" = "RUNNING" ]; then
+#               echo "Deployment successful!"
+#               exit 0
+#             elif [ "$STATUS" = "CREATE_FAILED" ] || [ "$STATUS" = "DELETE_FAILED" ]; then
+#               echo "Deployment failed with status: $STATUS"
+#               exit 1
+#             fi
+#             sleep 15
+#           done
+#           echo "Deployment timed out after 15 minutes"
+#           exit 1

@@ -91,36 +91,47 @@ router.get('/:id/diagnoses', requireAuth, async (req: AuthRequest, res: Response
 })
 
 // POST /api/issues/:id/diagnose — async trigger
-router.post('/:id/diagnose', requireAuth, async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const issue = await issueService.getById(req.params.id)
-
-    // Check for existing in-flight diagnosis
-    const existing = await diagnosisService.getByIssueId(req.params.id)
-    const inFlight = existing.find((d) => d.status === 'pending' || d.status === 'running')
-    if (inFlight) {
-      res.status(200).json({ diagnosisId: inFlight.id, status: inFlight.status })
-      return
-    }
-
-    // Create pending diagnosis and start agent in background
-    const diagnosis = await diagnosisService.create({
-      issueId: issue.id,
-      applicationId: issue.applicationId,
-    })
-
-    // Fire and forget — run agent in background
-    runDiagnosis(issue.id).catch((err) => {
-      log.error('Background diagnosis failed', {
-        diagnosisId: diagnosis.id,
-        error: err instanceof Error ? err.message : 'Unknown error',
-      })
-    })
-
-    res.status(202).json({ diagnosisId: diagnosis.id, status: 'pending' })
-  } catch (err) {
-    next(err)
-  }
+const diagnoseSchema = z.object({
+  level: z.enum(['quick', 'deep']).optional(),
 })
+
+router.post(
+  '/:id/diagnose',
+  requireAuth,
+  validate(diagnoseSchema),
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const issue = await issueService.getById(req.params.id)
+      const level = req.body.level ?? 'deep'
+
+      // Check for existing in-flight diagnosis
+      const existing = await diagnosisService.getByIssueId(req.params.id)
+      const inFlight = existing.find((d) => d.status === 'pending' || d.status === 'running')
+      if (inFlight) {
+        res.status(200).json({ diagnosisId: inFlight.id, status: inFlight.status })
+        return
+      }
+
+      // Create pending diagnosis and start agent in background
+      const diagnosis = await diagnosisService.create({
+        issueId: issue.id,
+        applicationId: issue.applicationId,
+        level,
+      })
+
+      // Fire and forget — run agent in background
+      runDiagnosis(issue.id, level).catch((err) => {
+        log.error('Background diagnosis failed', {
+          diagnosisId: diagnosis.id,
+          error: err instanceof Error ? err.message : 'Unknown error',
+        })
+      })
+
+      res.status(202).json({ diagnosisId: diagnosis.id, status: 'pending', level })
+    } catch (err) {
+      next(err)
+    }
+  }
+)
 
 export default router

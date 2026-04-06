@@ -8,11 +8,13 @@ export interface CodeSnippet {
 }
 
 export type DiagnosisStatus = 'pending' | 'running' | 'completed' | 'failed'
+export type DiagnosisLevel = 'quick' | 'deep'
 
 export interface Diagnosis {
   id: string
   issueId: string
   applicationId: string
+  level: DiagnosisLevel
   status: DiagnosisStatus
   summary: string
   rootCause?: string
@@ -33,4 +35,5 @@ export interface Diagnosis {
 export interface CreateDiagnosisInput {
   issueId: string
   applicationId: string
+  level?: DiagnosisLevel
 }

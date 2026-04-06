@@ -235,7 +235,7 @@ export default function IssueDetailPage() {
         <button
           onClick={handleDiagnose}
           disabled={diagnosing || hasInFlight}
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="px-4 py-2 bg-brand-primary text-white text-sm font-medium rounded-md hover:bg-brand-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {diagnosing || hasInFlight ? 'Diagnosing...' : 'Run Diagnosis'}
         </button>
@@ -248,7 +248,7 @@ export default function IssueDetailPage() {
           </p>
           <button
             onClick={handleDiagnose}
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-brand-primary text-white text-sm font-medium rounded-md hover:bg-brand-primary/90 transition-colors"
           >
             Run Diagnosis
           </button>

@@ -18,7 +18,7 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
           {item.to ? (
             <Link
               to={item.to}
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              className="hover:text-brand-secondary dark:hover:text-brand-accent transition-colors"
             >
               {item.label}
             </Link>

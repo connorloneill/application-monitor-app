@@ -1,38 +1,40 @@
-name: LLM Evals
-
-on:
-  pull_request:
-    paths:
-      - 'server/src/prompts/**'
-      - 'server/src/agents/**'
-      - 'server/src/evals/**'
-
-jobs:
-  evals:
-    name: Run LLM Evaluations
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install server deps
-        run: cd server && npm ci
-
-      - name: Run evals
-        run: cd server && npm run evals
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          BEDROCK_MODEL_ID: ${{ secrets.BEDROCK_MODEL_ID }}
-          JWT_SECRET: test-secret
-          NODE_ENV: test
-
-      - name: Upload eval metrics
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: eval-metrics
-          path: server/src/evals/metrics/latest.json
+# DISABLED: LLM evals — re-enable when deployment pipeline is restored
+#
+# name: LLM Evals
+#
+# on:
+#   pull_request:
+#     paths:
+#       - 'server/src/prompts/**'
+#       - 'server/src/agents/**'
+#       - 'server/src/evals/**'
+#
+# jobs:
+#   evals:
+#     name: Run LLM Evaluations
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version: '20'
+#
+#       - name: Install server deps
+#         run: cd server && npm ci
+#
+#       - name: Run evals
+#         run: cd server && npm run evals
+#         env:
+#           AWS_REGION: ${{ secrets.AWS_REGION }}
+#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           BEDROCK_MODEL_ID: ${{ secrets.BEDROCK_MODEL_ID }}
+#           JWT_SECRET: test-secret
+#           NODE_ENV: test
+#
+#       - name: Upload eval metrics
+#         uses: actions/upload-artifact@v4
+#         if: always()
+#         with:
+#           name: eval-metrics
+#           path: server/src/evals/metrics/latest.json

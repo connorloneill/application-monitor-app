@@ -118,7 +118,7 @@ export default function ApplicationDetailPage() {
             href={app.repoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 dark:text-blue-400 hover:underline"
+            className="text-brand-secondary dark:text-brand-accent hover:underline"
           >
             Repository
           </a>
@@ -134,7 +134,7 @@ export default function ApplicationDetailPage() {
           <select
             value={severityFilter}
             onChange={(e) => setSeverityFilter(e.target.value)}
-            className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-secondary"
           >
             <option value="all">All severities</option>
             <option value="critical">Critical</option>
@@ -145,7 +145,7 @@ export default function ApplicationDetailPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-secondary"
           >
             <option value="all">All statuses</option>
             <option value="open">Open</option>
@@ -183,7 +183,7 @@ export default function ApplicationDetailPage() {
                   <td className="px-4 py-3">
                     <Link
                       to={`/applications/${appId}/issues/${issue.id}`}
-                      className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                      className="text-brand-secondary dark:text-brand-accent hover:underline font-medium"
                     >
                       {issue.title}
                     </Link>

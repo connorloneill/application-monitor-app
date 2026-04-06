@@ -46,7 +46,7 @@ export default function ProblemReportDetailPage() {
     return (
       <div className="text-center py-12">
         <p className="text-red-600 dark:text-red-400">{error ?? 'Report not found'}</p>
-        <Link to="/" className="text-blue-600 hover:underline mt-4 inline-block">
+        <Link to="/" className="text-brand-secondary hover:underline mt-4 inline-block">
           Back to reports
         </Link>
       </div>
@@ -57,7 +57,7 @@ export default function ProblemReportDetailPage() {
 
   return (
     <div>
-      <Link to="/" className="text-sm text-blue-600 dark:text-blue-400 hover:underline mb-4 inline-block">
+      <Link to="/" className="text-sm text-brand-secondary dark:text-brand-accent hover:underline mb-4 inline-block">
         &larr; Back to reports
       </Link>
 
@@ -118,7 +118,7 @@ export default function ProblemReportDetailPage() {
               disabled={updating || currentStatus === s}
               className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
                 currentStatus === s
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-brand-primary text-white'
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               } disabled:opacity-50`}
             >

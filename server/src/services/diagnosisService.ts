@@ -38,6 +38,7 @@ export async function create(input: CreateDiagnosisInput): Promise<Diagnosis> {
     id: uuidv4(),
     issueId: input.issueId,
     applicationId: input.applicationId,
+    level: input.level ?? 'deep',
     status: 'pending',
     summary: '',
     codeSnippets: [],

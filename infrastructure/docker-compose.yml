@@ -33,5 +33,16 @@ services:
       - client
       - server
 
+  # Production-like single container (use: docker compose --profile prod up combined)
+  combined:
+    profiles: ["prod"]
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.combined
+    ports:
+      - '3000:3000'
+    env_file:
+      - ../server/.env
+
 volumes:
   logs:

@@ -7,7 +7,7 @@ import * as applicationService from '../services/applicationService'
 import * as diagnosisService from '../services/diagnosisService'
 import { getRepoTree, getFileContent } from './tools/codeRetrieval'
 import { getLogger } from '../utils/logger'
-import type { Diagnosis, CodeSnippet } from '../models'
+import type { Diagnosis, DiagnosisLevel, CodeSnippet } from '../models'
 
 const log = getLogger('diagnosisAgent')
 
@@ -22,6 +22,13 @@ interface DeepAnalysisResult {
   rootCause: string
   suggestedFix: string
   codeSnippets: CodeSnippet[]
+}
+
+interface QuickDiagnosisResult {
+  summary: string
+  rootCause: string
+  suggestedFix: string
+  codeSnippets: []
 }
 
 function parseJsonResponse<T>(content: string): T {
@@ -46,7 +53,7 @@ function buildIssueContext(issue: {
   return context
 }
 
-export async function runDiagnosis(issueId: string): Promise<Diagnosis> {
+export async function runDiagnosis(issueId: string, level: DiagnosisLevel = 'deep'): Promise<Diagnosis> {
   const requestId = uuidv4()
 
   // Load context
@@ -70,6 +77,7 @@ export async function runDiagnosis(issueId: string): Promise<Diagnosis> {
   const diagnosis = await diagnosisService.create({
     issueId: issue.id,
     applicationId: application.id,
+    level,
   })
   await diagnosisService.update(diagnosis.id, { status: 'running' })
 
@@ -77,6 +85,62 @@ export async function runDiagnosis(issueId: string): Promise<Diagnosis> {
   await issueService.update(issueId, { status: 'diagnosing' })
 
   try {
+    // Quick diagnosis — single LLM call, no code retrieval
+    if (level === 'quick') {
+      log.info('Quick diagnosis: analyzing issue context only', { diagnosisId: diagnosis.id })
+
+      const issueContext = buildIssueContext(issue)
+      const quickPrompt = getPrompt('quick_diagnosis_system')
+      const quickPromptVersion = getPromptVersion('quick_diagnosis_system')
+
+      const quickResponse = await invokeModel({
+        systemPrompt: quickPrompt,
+        messages: [{ role: 'user', content: issueContext }],
+        requestId,
+        feature: 'quick_diagnosis',
+      })
+
+      let quickResult: QuickDiagnosisResult
+      try {
+        quickResult = parseJsonResponse<QuickDiagnosisResult>(quickResponse.content)
+      } catch {
+        log.warn('Failed to parse quick diagnosis response, storing raw', {
+          diagnosisId: diagnosis.id,
+        })
+        quickResult = {
+          summary: quickResponse.content,
+          rootCause: '',
+          suggestedFix: '',
+          codeSnippets: [],
+        }
+      }
+
+      await diagnosisService.update(diagnosis.id, {
+        status: 'completed',
+        summary: quickResult.summary,
+        rootCause: quickResult.rootCause,
+        suggestedFix: quickResult.suggestedFix,
+        codeSnippets: [],
+        modelId: config.bedrock.modelId,
+        promptVersion: quickPromptVersion,
+        tokenUsage: {
+          promptTokens: quickResponse.promptTokens,
+          completionTokens: quickResponse.completionTokens,
+        },
+        latencyMs: quickResponse.latencyMs,
+        completedAt: new Date().toISOString(),
+      })
+
+      await issueService.update(issueId, { status: 'diagnosed' })
+
+      log.info('Quick diagnosis completed', {
+        diagnosisId: diagnosis.id,
+        latencyMs: quickResponse.latencyMs,
+      })
+
+      return diagnosisService.getById(diagnosis.id)
+    }
+
     // Pass 1: Broad scan — identify candidate files
     log.info('Pass 1: Scanning file tree', { diagnosisId: diagnosis.id, repo: application.repoUrl })
 
@@ -96,6 +160,7 @@ export async function runDiagnosis(issueId: string): Promise<Diagnosis> {
         },
       ],
       requestId,
+      feature: 'broad_scan',
     })
 
     let broadResult: BroadScanResult
@@ -185,6 +250,7 @@ export async function runDiagnosis(issueId: string): Promise<Diagnosis> {
         },
       ],
       requestId,
+      feature: 'deep_analysis',
     })
 
     let deepResult: DeepAnalysisResult

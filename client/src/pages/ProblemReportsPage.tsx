@@ -85,7 +85,7 @@ export default function ProblemReportsPage() {
           placeholder="Search reports..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 min-w-[200px] max-w-sm px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 min-w-[200px] max-w-sm px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-secondary"
         />
         <select
           value={severityFilter}
@@ -122,7 +122,7 @@ export default function ProblemReportsPage() {
             <Link
               key={report.report_id}
               to={`/reports/${report.report_id}`}
-              className="block bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all"
+              className="block bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:border-brand-accent dark:hover:border-brand-secondary hover:shadow-md transition-all"
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1 min-w-0">
