@@ -31,8 +31,8 @@ export default function ProblemReportDetailPage() {
     try {
       const res = await updateReportStatus(reportId, status)
       setReport(res.data)
-    } catch (err: any) {
-      setError(err.message ?? 'Failed to update status')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to update status')
     } finally {
       setUpdating(false)
     }

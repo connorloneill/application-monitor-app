@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { Fragment } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import {
@@ -28,7 +28,6 @@ function classNames(...classes: (string | boolean | undefined | null)[]) {
 }
 
 export default function Sidebar({ isMobileOpen, onMobileClose, user, onLogout }: SidebarProps) {
-  const location = useLocation()
   const { theme, toggleTheme } = useTheme()
 
   return (

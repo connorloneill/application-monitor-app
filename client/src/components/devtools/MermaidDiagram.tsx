@@ -38,7 +38,7 @@ export default function MermaidDiagram({ definition, onNodeClick }: MermaidDiagr
 
       // Parse diagram to extract node IDs and inject click directives
       const lines = definition.trim().split('\n')
-      const nodeIdRegex = /^\s*(\w+)[\[("{]/
+      const nodeIdRegex = /^\s*(\w+)[[("{]/
       const nodeIds: string[] = []
       for (const line of lines) {
         const match = line.match(nodeIdRegex)
