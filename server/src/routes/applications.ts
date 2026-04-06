@@ -37,7 +37,7 @@ router.get('/', requireAuth, async (_req: AuthRequest, res: Response, next: Next
 // GET /api/applications/:id
 router.get('/:id', requireAuth, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const application = await applicationService.getById(req.params.id)
+    const application = await applicationService.getById(req.params.id as string)
     res.json(application)
   } catch (err) {
     next(err)
@@ -68,7 +68,7 @@ router.put(
   validate(updateSchema),
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const application = await applicationService.update(req.params.id, req.body)
+      const application = await applicationService.update(req.params.id as string, req.body)
       res.json(application)
     } catch (err) {
       next(err)
@@ -83,7 +83,7 @@ router.delete(
   requireRole('admin'),
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      await applicationService.remove(req.params.id)
+      await applicationService.remove(req.params.id as string)
       res.status(204).end()
     } catch (err) {
       next(err)
@@ -95,7 +95,7 @@ router.delete(
 router.get('/:id/issues', requireAuth, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { severity, status } = req.query as { severity?: string; status?: string }
-    const issues = await issueService.getByApplicationId(req.params.id, { severity, status })
+    const issues = await issueService.getByApplicationId(req.params.id as string, { severity, status })
     res.json({ data: issues, total: issues.length })
   } catch (err) {
     next(err)

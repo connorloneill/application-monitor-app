@@ -33,7 +33,7 @@ const updateSchema = z.object({
 // GET /api/issues/:id
 router.get('/:id', requireAuth, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const issue = await issueService.getById(req.params.id)
+    const issue = await issueService.getById(req.params.id as string)
     res.json(issue)
   } catch (err) {
     next(err)
@@ -62,7 +62,7 @@ router.put(
   validate(updateSchema),
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const issue = await issueService.update(req.params.id, req.body)
+      const issue = await issueService.update(req.params.id as string, req.body)
       res.json(issue)
     } catch (err) {
       next(err)
@@ -73,7 +73,7 @@ router.put(
 // DELETE /api/issues/:id
 router.delete('/:id', requireAuth, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    await issueService.remove(req.params.id)
+    await issueService.remove(req.params.id as string)
     res.status(204).end()
   } catch (err) {
     next(err)
@@ -83,7 +83,7 @@ router.delete('/:id', requireAuth, async (req: AuthRequest, res: Response, next:
 // GET /api/issues/:id/diagnoses
 router.get('/:id/diagnoses', requireAuth, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const diagnoses = await diagnosisService.getByIssueId(req.params.id)
+    const diagnoses = await diagnosisService.getByIssueId(req.params.id as string)
     res.json({ data: diagnoses, total: diagnoses.length })
   } catch (err) {
     next(err)
@@ -101,11 +101,11 @@ router.post(
   validate(diagnoseSchema),
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const issue = await issueService.getById(req.params.id)
+      const issue = await issueService.getById(req.params.id as string)
       const level = req.body.level ?? 'deep'
 
       // Check for existing in-flight diagnosis
-      const existing = await diagnosisService.getByIssueId(req.params.id)
+      const existing = await diagnosisService.getByIssueId(req.params.id as string)
       const inFlight = existing.find((d) => d.status === 'pending' || d.status === 'running')
       if (inFlight) {
         res.status(200).json({ diagnosisId: inFlight.id, status: inFlight.status })
